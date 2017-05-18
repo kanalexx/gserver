@@ -2,8 +2,9 @@ package gserver;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 /**
  * @author Alexander Kanunnikov
@@ -16,8 +17,10 @@ public class Main {
         PropertyConfigurator.configure("log4j.properties");
         Server server = new Server(8088);
 
-        Handler frontend = new Frontend();
-        server.setHandler(frontend);
+        Frontend frontend = new Frontend();
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.addServlet(new ServletHolder(frontend), "/*");
+        server.setHandler(context);
 
         server.start();
         server.join();
