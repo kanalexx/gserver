@@ -19,7 +19,7 @@ public class Main {
 
         Frontend frontend = new Frontend();
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.addServlet(new ServletHolder(frontend), "/*");
+        context.addServlet(new ServletHolder(frontend), "");
         server.setHandler(context);
 
         server.start();

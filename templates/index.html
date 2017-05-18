@@ -6,9 +6,10 @@
 </head>
 <body>
     <h1>Hello World.</h1>
-    <form action="authorise" method="post">
+    <form method="post">
         Пользователь: <input name="userName" type="text" value="${userSession.userName}"> <input type="submit" value="Отправить"><br>
-        Сессия: <input name="sessionId" value="${userSession.sessionId}">
+        Сессия: ${userSession.sessionId}
+        <input name="sessionId" type="hidden" value="${userSession.sessionId}">
     </form>
 </body>
 </html>

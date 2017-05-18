@@ -21,7 +21,7 @@ public class Frontend extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(Frontend.class);
     private AtomicInteger sessionIdGenerator = new AtomicInteger(0);
     private AtomicInteger userIdGenerator = new AtomicInteger(0);
-    private Map<String, UserSession> users = new HashMap<>();
+    private Map<Integer, UserSession> users = new HashMap<>();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -35,18 +35,27 @@ public class Frontend extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> pageVariables = new HashMap<>();
-        String sessionId = req.getParameter("sessionId");
+        String sesId = req.getParameter("sessionId");
+        Integer sessionId = sesId == null ? null : Integer.valueOf(sesId);
         String userName = req.getParameter("userName");
+        UserSession userSession;
         if (sessionId != null) {
-            UserSession userSession = users.get(sessionId);
-            if (userSession == null) {
-                userSession = new UserSession(Integer.valueOf(sessionId), userName, userIdGenerator.addAndGet(1));
-                users.put(sessionId, userSession);
+            if (userName == null || userName.isEmpty()) {
+                userSession = new UserSession(sessionId, "", 0);
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            } else {
+                userSession = users.get(sessionId);
+                if (userSession == null) {
+                    userSession = new UserSession(sessionId, userName, userIdGenerator.addAndGet(1));
+                    users.put(sessionId, userSession);
+                }
+                resp.setStatus(HttpServletResponse.SC_OK);
             }
             pageVariables.put("userSession", userSession);
+            resp.setContentType("text/html;charset=utf-8");
+            resp.getWriter().print(PageGenerator.getPage("index.html", pageVariables));
+        } else {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
-        resp.setContentType("text/html;charset=utf-8");
-        resp.getWriter().print(PageGenerator.getPage("index.html", pageVariables));
-        resp.setStatus(HttpServletResponse.SC_OK);
     }
 }
